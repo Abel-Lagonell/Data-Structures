@@ -220,7 +220,7 @@ int main(){
     list.PushBack(14);
 
     list.DisplayAll();
-    cout << list.Find(25) <<endl << list.Find(6) << endl << list.Empty() << endl;
+    cout << ((list.Find(25))? "TRUE":"FALSE") <<endl << ((list.Find(6))? "TRUE":"FALSE") << endl << ((list.Empty())? "TRUE":"FALSE") << endl;
     list.AddBefore(94,3);
     list.DisplayAll();
     list.AddAfter(5,2);
@@ -236,5 +236,5 @@ int main(){
     list.PopFront();
     list.PopFront();
     list.PopFront();
-    cout << list.Empty() << endl;
+    cout << ((list.Empty())? "TRUE":"FALSE") << endl;
 }
