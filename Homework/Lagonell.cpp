@@ -6,7 +6,6 @@
  * @date 2023-01-30
  * 
  * @copyright Copyright (c) 2023
- * 
  */
 
 #include <iostream>
@@ -117,36 +116,47 @@ public:
         return ((head == NULL)? true : false);
     }
 
-    void AddAfter(Node *node, int position) {  // adds the node after specified position
-        Node *curr = head;
-        if (Empty()){
-            cout << "List is empty" << endl;
-            return;
-        }
-        for (int i = 0; i < position; i++){
-            curr = curr->next;
-        }
-        node->next = curr->next;
-        curr->next = node;
-        makeTail();
-    }
-
-    void AddBefore(Node *node, int position){ // add the node before the specified position
+    void AddBefore(int data, int index){//adds the data before the specified index
         Node *curr = head;
         Node *prev = nullptr;
         if (Empty()){
             cout << "List is empty" << endl;
             return;
         }
-        for (int i = 0; i < position; i++){
+        if (!(index >= 0)){
+            cout << "Index out of bounds" << endl;
+            return;
+        }
+        for (int i = 0; i < index; i++){
             prev = curr;
             curr = curr->next;
         }
-        node->next = curr;
+        Node *newNode = new Node;
+        newNode->data = data;
+        newNode->next = curr;
         if (prev == nullptr)
-            head = node;
+            head = newNode;
         else
-            prev->next = node;
+            prev->next = newNode;
+    }
+
+    void AddAfter(int data, int index){//adds the data after the specified index
+        Node *curr = head;
+        if (Empty()){
+            cout << "List is empty" << endl;
+            return;
+        }
+        if (!(index >= 0)){
+            cout << "Index out of bounds" << endl;
+            return;
+        }
+        for (int i = 0; i < index; i++){
+            curr = curr->next;
+        }
+        Node *newNode = new Node;
+        newNode->data = data;
+        newNode->next = curr->next;
+        curr->next = newNode;
         makeTail();
     }
 
@@ -177,21 +187,54 @@ public:
         return count;
     }
 
-    void ReplaceKey(Node *node, int key){ //replaces the first instance of key with node
+    void ReplaceKey(int data, int index){ //replaces the data at the specified index with data
         Node *curr = head;
         if (Empty()){
             cout << "List is empty" << endl;
             return;
         }
-        while (curr->next != nullptr){
-            if (curr->data == key){
-                node->next = curr->next;
-                curr->data = node->data;
-                curr->next = node->next;
-                break;
-            }
+        for (int i = 0; i < index; i++){
             curr = curr->next;
         }
+        curr->data = data;
         makeTail();
     }
 };
+
+int main(){
+    SinglyLinkedList list;
+    list.PushFront(25);
+    list.PushFront(50);
+    list.PushFront(90);
+    list.PushFront(40);
+    list.PushBack(35);
+
+    list.DisplayAll();
+    cout << list.TopFront() << endl << list.TopBack() << endl;
+    list.PopFront();
+    list.DisplayAll();
+    list.PopBack();
+    list.DisplayAll();
+    list.PushBack(10);
+    list.PushBack(12);
+    list.PushBack(14);
+
+    list.DisplayAll();
+    cout << list.Find(25) <<endl << list.Find(6) << endl << list.Empty() << endl;
+    list.AddBefore(94,3);
+    list.DisplayAll();
+    list.AddAfter(5,2);
+    list.DisplayAll();
+    cout << list.Size() << endl;
+    list.ReplaceKey(87,6);
+    list.DisplayAll(); 
+    list.PopFront();
+    list.PopFront();
+    list.PopFront();
+    list.PopFront();
+    list.PopFront();
+    list.PopFront();
+    list.PopFront();
+    list.PopFront();
+    cout << list.Empty() << endl;
+}

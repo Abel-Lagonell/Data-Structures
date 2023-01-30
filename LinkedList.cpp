@@ -34,11 +34,17 @@ private:
 public:
     SinglyLinkedList():head(nullptr){}
 
-    void PushFront(T key){ //add to Front 
+    void PushFront(T key){ //add data to Front 
         Node<T> *temp = new Node<T>;
         temp->data = key;
         temp->next = head;
         head = temp;
+        makeTail();
+    }
+
+    void PushFront(Node<T> *node){ //add node to Front
+        node->next = head;
+        head = node;
         makeTail();
     }
     
@@ -65,6 +71,11 @@ public:
         temp->data = key;
         tail->next = temp;
         tail = temp;
+    }
+
+    void PushBack(Node<T> *node){ // add node to back
+        tail->next = node;
+        tail = node;
     }
     
     T TopBack(){ //return back item
@@ -135,6 +146,29 @@ public:
     bool Empty(){ //empty list?
         return ((head == NULL)? true : false);
     }
+
+    void AddBeforeInstance(T data, T key){//adds data before first instance of the node with the key
+        Node<T> *curr = head;
+        Node<T> *prev = nullptr;
+        if (Empty()){
+            cout << "List is empty" << endl;
+            return;
+        }
+        while (curr->next != nullptr){
+            if (curr->data == key){
+                Node<T> *newNode = new Node<T>;
+                newNode->data = data;
+                newNode->next = curr;
+                if (prev == nullptr)
+                    head = newNode;
+                else
+                    prev->next=newNode;
+                break;
+            }
+            prev = curr;
+            curr = curr->next;
+        }
+    }
     
     void AddBeforeInstance(Node<T> *node, T key){ //adds key before first instance of node
         Node<T> *curr = head;
@@ -156,6 +190,26 @@ public:
             curr = curr->next;
         }
     }
+
+    void AddAfterInstance(T data, T key){ // adds data after first instance of node with the key
+        Node<T> *curr = head;
+        if (Empty()){
+            cout << "List is empty" << endl;
+            return;
+        }
+        while (curr->next != nullptr){
+            if (curr->data == key){
+                Node<T> *newNode = new Node<T>;
+                newNode->data = data;
+                newNode->next = curr->next;
+                curr->next = newNode;
+                break;
+            }
+            curr = curr->next;
+        }
+        makeTail();
+    }
+
     void AddAfterInstance(Node<T> *node, T key){ //adds key after first instance of the node
         Node<T> *curr = head;
         if (Empty()){
@@ -171,6 +225,29 @@ public:
             curr = curr->next;
         }
         makeTail();
+    }
+
+    void AddBeforeAllInstances(T data, T key){ //adds the data before all instances of the node with the key
+        Node<T> *curr = head;
+        Node<T> *prev = nullptr;
+        if (Empty()){
+            cout << "List is empty" << endl;
+            return;
+        }
+        while (curr->next != nullptr){
+            if (curr->data == key){
+                Node<T> *newNode = new Node<T>;
+                newNode->data = data;
+                newNode->next = curr;
+                if (prev == nullptr)
+                    head = newNode;
+                else
+                    prev->next=newNode;
+            }
+            prev = curr;
+            curr = curr->next;
+        }
+
     }
 
     void AddBeforeAllInstances(Node<T> *node, T key){ //adds key before all instances of the node
@@ -195,7 +272,27 @@ public:
         }
     }
 
-    void AddAfterAllIntances(Node<T> *node, T key){ //adds key after all instances of the node
+    void AddAfterAllInstances(T data, T key){ //adds data after all instances of the node with the key
+        Node<T> *curr = head;
+        if (Empty()){
+            cout << "List is empty" << endl;
+            return;
+        }
+        while (curr->next != nullptr){
+            if (curr->data == key){
+                Node<T> *newNode = new Node<T>;
+                newNode->data = data;
+                newNode->next = curr->next;
+                curr->next = newNode;
+                DisplayAll();
+            }
+            curr = curr->next;
+        }
+        makeTail();
+
+    }
+
+    void AddAfterAllInstances(Node<T> *node, T key){ //adds key after all instances of the node
         Node<T> *curr = head;
         if (Empty()){
             cout << "List is empty" << endl;
@@ -214,13 +311,37 @@ public:
         makeTail();
     }
 
-    void AddAfterPosition(Node<T> *node, int position) {  // adds the node after specified position
+    void AddAfterIndex(T data, int index){//adds the data after the specified index
         Node<T> *curr = head;
         if (Empty()){
             cout << "List is empty" << endl;
             return;
         }
-        for (int i = 0; i < position; i++){
+        if (!(index >= 0)){
+            cout << "Index out of bounds" << endl;
+            return;
+        }
+        for (int i = 0; i < index; i++){
+            curr = curr->next;
+        }
+        Node<T> *newNode = new Node<T>;
+        newNode->data = data;
+        newNode->next = curr->next;
+        curr->next = newNode;
+        makeTail();
+    }
+
+    void AddAfterIndex(Node<T> *node, int index) {  // adds the node after specified index
+        Node<T> *curr = head;
+        if (Empty()){
+            cout << "List is empty" << endl;
+            return;
+        }
+        if (!(index >= 0)){
+            cout << "Index out of bounds" << endl;
+            return;
+        }
+        for (int i = 0; i < index; i++){
             curr = curr->next;
         }
         node->next = curr->next;
@@ -228,14 +349,42 @@ public:
         makeTail();
     }
 
-    void AddBeforePosition(Node<T> *node, int position){ // add the node before the specified position
+    void AddBeforeIndex(T data, T index){//adds the data before the specified index
         Node<T> *curr = head;
         Node<T> *prev = nullptr;
         if (Empty()){
             cout << "List is empty" << endl;
             return;
         }
-        for (int i = 0; i < position; i++){
+        if (!(index >= 0)){
+            cout << "Index out of bounds" << endl;
+            return;
+        }
+        for (int i = 0; i < index; i++){
+            prev = curr;
+            curr = curr->next;
+        }
+        Node<T> *newNode = new Node<T>;
+        newNode->data = data;
+        newNode->next = curr;
+        if (prev == nullptr)
+            head = newNode;
+        else
+            prev->next = newNode;
+    }
+
+    void AddBeforeIndex(Node<T> *node, int index){ // add the node before the specified index
+        Node<T> *curr = head;
+        Node<T> *prev = nullptr;
+        if (Empty()){
+            cout << "List is empty" << endl;
+            return;
+        }
+        if (!(index >= 0)){
+            cout << "Index out of bounds" << endl;
+            return;
+        }
+        for (int i = 0; i < index; i++){
             prev = curr;
             curr = curr->next;
         }
@@ -244,7 +393,6 @@ public:
             head = node;
         else
             prev->next = node;
-        makeTail();
     }
 
     void DisplayAll(){ //Uses a function to print the list
@@ -274,7 +422,7 @@ public:
         return count;
     }
 
-    void ReplaceKey(Node<T> *node, T key){ //replaces the first instance of key with node
+    void ReplaceInstance(T data, T key){ // replaces the first instance of key with data
         Node<T> *curr = head;
         if (Empty()){
             cout << "List is empty" << endl;
@@ -282,13 +430,53 @@ public:
         }
         while (curr->next != nullptr){
             if (curr->data == key){
-                node->next = curr->next;
-                curr->data = node->data;
-                curr->next = node->next;
+                curr->data = data;
                 break;
             }
             curr = curr->next;
         }
+        makeTail();
+    }
+
+    void ReplaceInstance(Node<T> *node, T key){ //replaces the first instance of key with node
+        Node<T> *curr = head;
+        if (Empty()){
+            cout << "List is empty" << endl;
+            return;
+        }
+        while (curr->next != nullptr){
+            if (curr->data == key){
+                curr->data = node->data;
+                break;
+            }
+            curr = curr->next;
+        }
+        makeTail();
+    }
+
+    void ReplaceKey(T data, int index){ //replaces the data at the specified index with data
+        Node<T> *curr = head;
+        if (Empty()){
+            cout << "List is empty" << endl;
+            return;
+        }
+        for (int i = 0; i < index; i++){
+            curr = curr->next;
+        }
+        curr->data = data;
+        makeTail();
+    }
+
+    void ReplaceKey(Node<T> *node, int index){ //replaces the node at the specified index with node
+        Node<T> *curr = head;
+        if (Empty()){
+            cout << "List is empty" << endl;
+            return;
+        }
+        for (int i = 0; i < index; i++){
+            curr = curr->next;
+        }
+        curr->data = node->data;
         makeTail();
     }
 
