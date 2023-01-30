@@ -63,30 +63,16 @@ public:
     void PushBack(T key){ // add to back
         Node<T> *temp = new Node<T>;
         temp->data = key;
-        temp->next = nullptr;
-        if(head == nullptr){
-            head = temp;
-        }
-        else{
-            Node<T> *curr = head;
-            while(curr->next != nullptr){
-                curr = curr->next;
-            }
-            curr->next = temp;
-        }
+        tail->next = temp;
         tail = temp;
     }
     
     T TopBack(){ //return back item
-        Node<T> *curr = head;
         if (Empty()){
             cout << "List is empty" << endl;
             return NULL;
         }    
-        while(curr->next != nullptr){
-            curr = curr->next;
-        }
-        return curr->data;
+        return tail->data;
     }
     
     void PopBack(){ //remove back item
@@ -142,7 +128,7 @@ public:
             return;
         }  
         while(Find(key))
-            Erase(key);
+            EraseInstance(key);
         makeTail();
     }
 
@@ -316,29 +302,3 @@ public:
         return os;
     }
 };
-
-
-int main(){
-    SinglyLinkedList<int> arr;
-    cout << "Is the array empty?\t" << (arr.Empty()? "yes":"no") << endl;
-
-    for (int i =0; i <11; i++){
-        if(i%2==0)
-            arr.PushFront(i);
-        else
-            arr.PushBack(i*2);
-    }
-    cout << arr;
-    //arr.Erase(2);
-    cout << arr;
-    cout << "Is 3 in the array?\t"<< (arr.Find(3)? "yes":"no") << endl;
-    arr.PopFront(); arr.PopBack(); 
-    cout << arr << arr.TopFront() << " is the front of the array while " << arr.TopBack() << " is the in the back" << endl;
-    Node<int> *node1 = new Node<int>; node1->data=13;
-    Node<int> *node2 = new Node<int>; node2->data=13;
-    arr.AddAfterPosition(node1, 5);
-    arr.AddBeforePosition(node2, 3);
-    cout << arr;
-
-
-}
