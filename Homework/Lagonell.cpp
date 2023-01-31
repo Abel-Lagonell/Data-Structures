@@ -17,7 +17,7 @@ public:
     Node *next;
 
     Node(){
-        next=nullptr;
+        next=NULL;
     }
 };
 
@@ -31,8 +31,8 @@ private:
 
     void makeTail(){
         Node *curr = head;
-        if(tail->next != nullptr){
-            while(curr->next != nullptr){
+        if(tail->next != NULL){
+            while(curr->next != NULL){
                 curr = curr->next;
             }
             tail = curr;
@@ -40,7 +40,7 @@ private:
     }
 
 public:
-    SinglyLinkedList():head(nullptr){}
+    SinglyLinkedList():head(NULL){}
 
     void PushFront(int key){ //add to Front 
         Node *temp = new Node;
@@ -86,17 +86,17 @@ public:
     
     void PopBack(){ //remove back item
         Node *curr = head;
-        Node *prev = nullptr;
+        Node *prev = NULL;
         if (Empty()){
             cout << "List is empty" << endl;
             return;
         }    
-        while(curr->next != nullptr){
+        while(curr->next != NULL){
             prev = curr;
             curr = curr->next;
         }
         delete curr;
-        prev->next = nullptr;
+        prev->next = NULL;
         tail = prev;
     }
     
@@ -104,7 +104,7 @@ public:
         Node *curr = head;
         if(Empty())
             return false;
-        while (curr->next != nullptr){
+        while (curr->next != NULL){
             if (curr->data == key)
                 return true;
             curr = curr->next;
@@ -118,7 +118,7 @@ public:
 
     void AddBefore(int data, int index){//adds the data before the specified index
         Node *curr = head;
-        Node *prev = nullptr;
+        Node *prev = NULL;
         if (Empty()){
             cout << "List is empty" << endl;
             return;
@@ -134,7 +134,7 @@ public:
         Node *newNode = new Node;
         newNode->data = data;
         newNode->next = curr;
-        if (prev == nullptr)
+        if (prev == NULL)
             head = newNode;
         else
             prev->next = newNode;
@@ -166,8 +166,8 @@ public:
             cout << "List is empty" << endl;
             return;
         }
-        while (curr != nullptr){
-            cout << curr->data << ((curr->next == nullptr)? "":", ");
+        while (curr != NULL){
+            cout << curr->data << ((curr->next == NULL)? "":", ");
             curr = curr->next;
         }
         cout << endl;
@@ -180,7 +180,7 @@ public:
             cout << "List is empty" << endl;
             return -1;
         }
-        while (curr != nullptr){
+        while (curr != NULL){
             count++;
             curr = curr->next;
         }
