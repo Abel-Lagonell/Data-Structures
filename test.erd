@@ -1,0 +1,55 @@
+erdiagram Model
+notation=crowsfoot
+
+entity Player{
+    ID key
+    PLAYER_FIRST
+    PLAYER_LAST
+    PLAYER_AGE
+    PLAYER_TEAM partial-key
+    FAMILY_ID partial-key
+}
+
+entity Parent{
+    ID key
+    PARENT_FIRST
+    PARENT_LAST
+    HOME_PHONE
+    STREET
+    CITY
+    STATE
+    ZIP
+    FAMILY_ID partial-key
+}
+
+entity Coach{
+    ID key
+    COACH_FIRST
+    COACH_LAST
+    COACH_AGE
+    COACH_TEAM partial-key
+}
+
+entity Team{
+    ID key
+    TEAM_NAME
+    TEAM_COLOR
+}
+
+entity Family{
+    ID key
+    FAMILY_NAME
+}
+
+relationship directs{
+    Team[1..1] -> Coach[1..N]
+}
+relationship consists{
+    Team[1..1] -> Player[0..N]
+}
+relationship belongs{
+    Player[1..N] -> Family[1]
+}
+relationship heads{
+    Parent[1..N] -> Family[1]
+}
