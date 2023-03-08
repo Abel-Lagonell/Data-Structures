@@ -49,6 +49,9 @@ Node  *AdjustHeight(Node *node);
 Node *Delete(Node *node);
 Node *AVLInsert(Node *root, Node *element);
 Node *AVLDelete(Node *node);
+int ComputerBF(Node *node); //Computer Binary Factor
+Node *FindSearch(Node *node, int element);
+Node *IsUnbalance(Node *node);
 
 int menu();
 void inorder(Node *currentPtr) {
@@ -462,24 +465,78 @@ Node *Delete(Node *node)
     }
 
 }
-Node *AVLDelete(Node*node) //delete the node and rebalance the tree
+Node *AVLDelete(Node *node) //delete the node and rebalance the tree
 {
     node = Delete(node);
     node = Rebalance(node);
     return node;
 }
 
+int ComputerBF(Node *node)
+{
+    int value = 0;
+
+    value = ComputeHeight (node -> left) - ComputeHeight (node -> right);
+
+    return value;
+}
+
+Node *FindSearch(Node *node, int value)
+{
+    if (node == NULL)
+    {
+        return node;
+    }
+
+    if (node -> data == value)
+    {
+        return node;
+    }
+
+    if (value < node -> data)
+    {
+        return FindSearch(node -> left, value);
+    }
+
+    else
+    {
+        return FindSearch(node -> right, value);
+    }
+}
+
+Node *IsUnbalance(Node *node)
+{
+    if (node == NULL)
+    {
+        return node;
+    }
+
+    if (ComputerBF(node) > 1 || ComputerBF(node) < -1)
+    {
+        cout << "The tree is unbalanced at node " << node -> data << endl;
+    }
+
+    else
+    {
+        cout << "The tree is balanced at node " << node -> data << endl;
+    }
+    return node;
+}
 
 // Prints out the menu of choices for the user and returns their choice.
 int menu() {
     int ans;
     cout<<"Here are your choices.\n";
-    cout<<"1. Insert an item into your tree.\n";
-    cout<<"2. Delete an item from your tree.\n";
-    cout<<"3. Search for an item in your tree.\n";
-    cout<<"4. Print the sum of the nodes. \n";
-    cout<<"5. Print out an inorder traversal.\n";//Should be #9
-    cout<<"6. Exit.\n";
+    cout<<"1.  Insert an item into your tree.\n";
+    cout<<"2.  Delete an item from your tree.\n";
+    cout<<"3.  Search for an item in your tree.\n";
+    cout<<"4.  Print the sum of the nodes. \n";
+    cout<<"5.  Print the next elements of the node with key x.\n";
+    cout<<"6.  Print the elements between x, and y.\n";
+    cout<<"7.  Print the height of the tree with root x.\n";
+    cout<<"8.  Print the sum of the list of elements between x, and y.\n";
+    cout<<"9.  Print out an inorder traversal.\n";
+    cout<<"10. Exit.\n";
     cin>> ans;
     return ans;
 }
@@ -499,16 +556,21 @@ int main()
             // Insert the value.
             myRoot = insert(myRoot, tempNode);
         }
-        if (ans == 2) {
+
+        if (ans == 2)
+        {
             cout<<"What value would you like to delete?\n";
             cin>>val;
             if (!find(myRoot, val))
                 cout<<"Sorry that value isn't in the tree to delete.\n";
-            else {
+            else
+            {
                 myRoot = deleteNode(myRoot, val);
             }
         }
-        if (ans == 3) {
+
+        if (ans == 3)
+        {
             cout<<"What value would you like to search for?\n";
             cin>>val;
             if (find(myRoot, val))
@@ -516,9 +578,22 @@ int main()
             else
                 cout<<" Did not find %d in the tree.\n";
         }
+
         if (ans == 4)
-            cout<<"The sum of the nodes in your tree is"<<add(myRoot)<<"\n";
-        if (ans == 5) {
+        {
+            cout << "The sum of the nodes in your tree is" << add(myRoot) << "\n";
+        }
+
+        if (ans == 5)
+        {
+            cout << "What would you like to insert?\n";
+            cin >> val;
+            tempNode = new Node(val);
+            myRoot = Next(tempNode);
+        }
+
+        if (ans == 9)
+        {
             // Print the resulting tree.
             cout<<"Here is an inorder traversal of your tree: ";
             inorder(myRoot);
