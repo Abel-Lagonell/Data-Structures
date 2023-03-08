@@ -46,6 +46,9 @@ Node *RebalanceLeft(Node *node);
 Node *RebalanceRight(Node *node);
 Node *Rebalance(Node *node);
 Node  *AdjustHeight(Node *node);
+Node *Delete(Node *node);
+Node *AVLInsert(Node *root, Node *element);
+Node *AVLDelete(Node *node);
 
 int menu();
 void inorder(Node *currentPtr) {
@@ -424,6 +427,48 @@ Node *Rebalance(Node *node)
     return temp;
 }
 
+Node *AVLInsert(Node *root, Node *element)
+{
+    root = insert(root, element);
+    if (!find(root ,element -> data)) //if the element is not found in the tree, then it is not inserted
+    {
+        root = Rebalance(root); //rebalance the tree
+    }
+    return root;
+}
+
+Node *Delete(Node *node)
+{
+    if (node == NULL)
+    {
+        return node;
+    }
+    if (node -> right == NULL)
+    {
+        Node *temp = node -> left;
+        delete node;
+        return temp;
+    }
+    else
+    {
+        Node *temp = Next(node);
+        temp -> left = node -> left;
+        if (temp != node -> right)
+        {
+            temp -> right = node -> right;
+        }
+        delete node;
+        return temp;
+    }
+
+}
+Node *AVLDelete(Node*node) //delete the node and rebalance the tree
+{
+    node = Delete(node);
+    node = Rebalance(node);
+    return node;
+}
+
 
 // Prints out the menu of choices for the user and returns their choice.
 int menu() {
@@ -438,12 +483,15 @@ int menu() {
     cin>> ans;
     return ans;
 }
-int main() {
+int main()
+{
     Node *myRoot=NULL, *tempNode;
     int done = 0,ans=1, val, q6data;
     ans = menu();
-    while (ans<8) {
-        if (ans == 1) {
+    while (ans<8)
+    {
+        if (ans == 1)
+        {
             // Get value to insert.
             cout<<"What value would you like to insert?";
             cin>>val;
