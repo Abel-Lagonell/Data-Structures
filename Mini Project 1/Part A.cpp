@@ -22,6 +22,7 @@ public:
         height = -1;
     }
 };
+//Premade Functions
 void inorder(Node *currentPtr);
 Node* insert(Node *root,Node *element);
 int add(Node *currentPtr);
@@ -38,9 +39,9 @@ Node* deleteNode(Node* root, int value);
 //My Functions
 Node *LeftDescendant(Node *node);
 Node *RightAncestor(Node *node);
-Node *Next(Node *node);
-Node *RotateLeft(Node *node);
-Node *RotateRight(Node *node);
+Node *Next(Node *node); //Change to int value
+Node *RotateLeft(Node *node); //Change to int value
+Node *RotateRight(Node *node); //Change to int value
 int ComputeHeight(Node *node);
 Node *RebalanceLeft(Node *node);
 Node *RebalanceRight(Node *node);
@@ -50,11 +51,12 @@ Node *Delete(Node *node);
 Node *AVLInsert(Node *root, Node *element);
 Node *AVLDelete(Node *node);
 int ComputerBF(Node *node); //Computer Binary Factor
-Node *FindSearch(Node *node, int element);
-Node *IsUnbalance(Node *node);
-
+Node *FindSearch(Node *node, int x, int y);
+Node *IsUnbalance(Node *node); //Change to int value
+int add(Node *currentPtr, int x, int y);
 int menu();
-void inorder(Node *currentPtr) {
+void inorder(Node *currentPtr)
+{
     // Only traverse the node if it's not null.
     if (currentPtr != NULL) {
         inorder(currentPtr->left); // Go Left.
@@ -62,6 +64,7 @@ void inorder(Node *currentPtr) {
         inorder(currentPtr->right); // Go Right.
     }
 }
+
 Node* insert(Node *root,Node *element) {
     // Inserting into an empty tree.
     if (root == NULL){
@@ -113,6 +116,7 @@ int add(Node *currentPtr)
     else
         return 0;
 }
+
 // Returns the parent of the node pointed to by node in the tree rooted at
 // root. If the node is the root of the tree, or the node doesn't exist in
 // the tree, null will be returned.
@@ -481,26 +485,26 @@ int ComputerBF(Node *node)
     return value;
 }
 
-Node *FindSearch(Node *node, int value)
+Node *FindSearch(Node *node, int x, int y)
 {
     if (node == NULL)
     {
-        return node;
+        return NULL;
     }
 
-    if (node -> data == value)
+    if (node->data >= x && node->data < y)
     {
         return node;
     }
 
-    if (value < node -> data)
+    if (node->data < x)
     {
-        return FindSearch(node -> left, value);
+        return FindSearch(node->right, x, y);
     }
 
-    else
+    if (node->data > y)
     {
-        return FindSearch(node -> right, value);
+        return FindSearch(node->left, x, y);
     }
 }
 
@@ -543,9 +547,9 @@ int menu() {
 int main()
 {
     Node *myRoot=NULL, *tempNode;
-    int done = 0,ans=1, val, q6data;
+    int done = 0,ans=1, val, x, y;
     ans = menu();
-    while (ans<8)
+    while (ans<10)
     {
         if (ans == 1)
         {
@@ -554,7 +558,7 @@ int main()
             cin>>val;
             tempNode = new Node(val); // Create the node.
             // Insert the value.
-            myRoot = insert(myRoot, tempNode);
+            myRoot =AVLInsert(myRoot, tempNode);
         }
 
         if (ans == 2)
@@ -563,8 +567,7 @@ int main()
             cin>>val;
             if (!find(myRoot, val))
                 cout<<"Sorry that value isn't in the tree to delete.\n";
-            else
-            {
+            else {
                 myRoot = deleteNode(myRoot, val);
             }
         }
@@ -576,20 +579,70 @@ int main()
             if (find(myRoot, val))
                 cout<<" Found"<<val<<"in the tree.\n";
             else
-                cout<<" Did not find %d in the tree.\n";
+                cout<<" Did not find" << val << "in the tree.\n";
         }
 
         if (ans == 4)
         {
-            cout << "The sum of the nodes in your tree is" << add(myRoot) << "\n";
+            cout << "The sum of the nodes in your tree is " << add(myRoot) << "\n";
         }
 
         if (ans == 5)
         {
-            cout << "What would you like to insert?\n";
+            cout << "Enter the value of the node which you want to find the next element of:\n";
             cin >> val;
-            tempNode = new Node(val);
-            myRoot = Next(tempNode);
+
+            Node *nodeToFind = findNode(myRoot, val);
+            if (nodeToFind == NULL)
+            {
+                cout << "Node not found.\n";
+            }
+            else
+            {
+                Node *nextNode = Next(nodeToFind);
+                if (nextNode == NULL)
+                {
+                    cout << "There is no next node.\n";
+                }
+                else
+                {
+                    cout << "The next node is " << nextNode -> data << "\n";
+                }
+            }
+        }
+        if (ans == 6)
+        {
+            cout << "Enter the start value of the range: ";
+            cin >> x;
+            cout << "Enter the end value of the range: ";
+            cin >> y;
+
+            Node *result = FindSearch(myRoot, x, y);
+            if (result == NULL)
+            {
+                cout << "No nodes found in the range.\n";
+            }
+
+            else
+            {
+                cout << "The nodes found in the range are [" << x << ", " << y << "]: ";
+                inorder(result);
+                cout << endl;
+            }
+        }
+        if (ans == 7)
+        {
+            cout << "The height of the tree is ";
+            cout << ComputeHeight(myRoot) << endl;
+        }
+
+        if (ans == 8)
+        {
+            cout << "Enter the start value of the range: ";
+            cin >> x;
+            cout << "Enter the start value of the range: ";
+            cin >> y;
+            cout << "The sum of the nodes in the range [" << x << ", " << y << "] is " << add(myRoot) << "\n";
         }
 
         if (ans == 9)
