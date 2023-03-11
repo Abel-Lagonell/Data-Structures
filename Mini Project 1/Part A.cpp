@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+
 using namespace std;
 class Node
 {
@@ -6,19 +8,24 @@ public:
     int data;
     Node *left;
     Node *right;
+    Node *parent; //Added a parent pointer
     int height; //Added a height value
+
     Node()
     {
         data = 0;
         left = NULL;
         right = NULL;
+        parent = NULL; // initialize parent to NULL
         height = -1; //By default, leaf node is 0 so make it -1 to avoid confusion
+
     }
     Node(int val)
     {
         data = val;
         left = NULL;
         right = NULL;
+        parent = NULL;
         height = -1;
     }
 };
@@ -37,7 +44,7 @@ Node* findNode(Node *currentPtr, int value);
 Node* deleteNode(Node* root, int value);
 
 //My Functions
-Node *LeftDescendant(Node *node);
+Node *LeftDescendant(Node *node); //LeftDescendant(N.Right)
 Node *RightAncestor(Node *node);
 Node *Next(Node *node); //Change to int value
 Node *RotateLeft(Node *node); //Change to int value
@@ -48,24 +55,29 @@ Node *RebalanceRight(Node *node);
 Node *Rebalance(Node *node);
 Node  *AdjustHeight(Node *node);
 Node *Delete(Node *node);
-Node *AVLInsert(Node *root, Node *element);
+Node *AVLInsert(int key, Node *root);
 Node *AVLDelete(Node *node);
 int ComputerBF(Node *node); //Computer Binary Factor
-Node *FindSearch(Node *node, int x, int y);
+Node *FindSearch(int x, int y, Node *root);
+Node *Find(int key, Node *root); // For FindSearch function
+
 Node *IsUnbalance(Node *node); //Change to int value
-int add(Node *currentPtr, int x, int y);
+
 int menu();
+
 void inorder(Node *currentPtr)
 {
     // Only traverse the node if it's not null.
-    if (currentPtr != NULL) {
+    if (currentPtr != NULL)
+    {
         inorder(currentPtr->left); // Go Left.
         cout<<" "<<currentPtr->data; // Print the root.
         inorder(currentPtr->right); // Go Right.
     }
 }
 
-Node* insert(Node *root,Node *element) {
+Node* insert(Node *root,Node *element)
+{
     // Inserting into an empty tree.
     if (root == NULL){
         return element;
@@ -263,7 +275,7 @@ Node* deleteNode(Node* root, int value) {
     delnode->data = saveVal;
     return root;
 }
-
+// Start here
 Node *LeftDescendant(Node *node)
 {
     if (node->left == NULL)
@@ -275,26 +287,28 @@ Node *LeftDescendant(Node *node)
         return LeftDescendant(node->left);
     }
 }
-Node* RightAncestor(Node *node)
+
+Node *RightAncestor(Node *root, Node *node)
 {
-    Node *root = NULL;
-    if (node == NULL) {
-        return NULL;
+    if (node == root)
+    {
+        return NULL; // no right ancestor exists for the root node
     }
-    else if (node->left != NULL) {
-        return maxVal(node->left);
+    Node *p = parent(root, node);
+    if (p == NULL || p->right == NULL || p->right == node)
+    {
+        return p; // return the parent if it is a right child or has no right sibling
     }
-    else {
-        Node *ancestor = parent(root, node);
-        while (ancestor != NULL && ancestor->left != node) {
-            node = ancestor;
-            ancestor = parent(root,ancestor);
-        }
-        return ancestor;
+    Node *q = p->parent;
+    while (q != NULL && q->right == p)
+    {
+        p = q;
+        q = p->parent;
     }
+    return q; // return the right ancestor of the node
 }
 
-Node *Next(Node *node)
+Node *Next(Node *node) // returns the next node in the tree
 {
     if (node->right != NULL)
     {
@@ -316,6 +330,7 @@ Node *RotateLeft(Node *node)
     return temp; //temp is the new root
 }
 
+/*
 Node *RotateRight(Node *node)
 //A right rotation on a node, involves making the left child of node the new root of the subtree,
     //a mirror image of the left rotation
@@ -325,8 +340,38 @@ Node *RotateRight(Node *node)
     temp->right = node; //node becomes temp's right child
     return temp; //temp is the new root
 }
+*/
 
-int ComputeHeight(Node *node)
+Node *RotateRight(Node *X)
+{
+    Node *P = X->parent;
+    Node *Y = X->left;
+    Node *B = Y->right;
+
+    Y->parent = P;
+    if (P != NULL)
+    {
+        if (P->right == X)
+        {
+            P->right = Y;
+        }
+        else
+        {
+            P->left = Y;
+        }
+    }
+    X->parent = Y;
+    Y->right = X;
+    if (B != NULL)
+    {
+        B->parent = X;
+    }
+    X->left = B;
+
+    return Y;
+}
+
+int ComputeHeight(Node *node) //Basically its the Height function
 {
     if (node == NULL)
     {
@@ -338,6 +383,16 @@ int ComputeHeight(Node *node)
         int rightHeight = ComputeHeight(node->right);
         return 1 + max(leftHeight, rightHeight); //1 to the maximum height of the left and right subtrees represents the height of the current node
     }
+}
+
+Node  *AdjustHeight(Node *node)
+{
+    if (node == NULL)
+    {
+        return node;
+    }
+    node -> height = 1 + max(ComputeHeight(node -> left), ComputeHeight(node -> right));
+    return node;
 }
 
 Node *RebalanceRight(Node *node)
@@ -381,30 +436,23 @@ Node *RebalanceLeft(Node *node)
 
     if (leftHeight > rightHeight)
     {
-        int rightLeftHeight = ComputeHeight(temp->left -> left);
-        int rightRightHeight = ComputeHeight(temp->right -> right);
+        int leftLeftHeight = ComputeHeight(temp->left->left);
+        int leftRightHeight = ComputeHeight(temp->left->right);
 
-        if (rightLeftHeight > rightRightHeight)
+        if (leftLeftHeight < leftRightHeight)
         {
-            temp -> left = RotateRight(temp -> left);
+            temp->left = RotateLeft(temp->left);
         }
-        return RotateLeft(node);
+
+        temp = RotateRight(temp);
+        AdjustHeight(temp->left);
+        AdjustHeight(temp);
     }
-    else
-    {
-        return node;
-    }
+
+    AdjustHeight(node);
+    return RotateLeft(node);
 }
 
-Node  *AdjustHeight(Node *node)
-{
-    if (node == NULL)
-    {
-        return node;
-    }
-    node -> height = 1 + max(ComputeHeight(node -> left), ComputeHeight(node -> right));
-    return node;
-}
 
 Node *Rebalance(Node *node)
 {
@@ -413,6 +461,11 @@ Node *Rebalance(Node *node)
     Node *root = new Node();
     int leftHeight = ComputeHeight(temp->left);
     int rightHeight = ComputeHeight(temp->right);
+
+    if (node == NULL)
+    {
+        return node;
+    }
 
     if (leftHeight > rightHeight + 1)
     {
@@ -434,41 +487,46 @@ Node *Rebalance(Node *node)
     return temp;
 }
 
-Node *AVLInsert(Node *root, Node *element)
+Node *AVLInsert(int key, Node *root)
 {
-    root = insert(root, element);
-    if (!find(root ,element -> data)) //if the element is not found in the tree, then it is not inserted
+    Node* newNode = new Node(key); // create new node with given key
+    root = insert(root, newNode);
+    if (!find(root, key)) // if the element is not found in the tree, then it is not inserted
     {
-        root = Rebalance(root); //rebalance the tree
+        root = Rebalance(root); // rebalanced the tree
     }
     return root;
 }
 
-Node *Delete(Node *node)
+Node* Delete(Node* node)
 {
     if (node == NULL)
     {
         return node;
     }
-    if (node -> right == NULL)
-    {
-        Node *temp = node -> left;
-        delete node;
-        return temp;
-    }
-    else
-    {
-        Node *temp = Next(node);
-        temp -> left = node -> left;
-        if (temp != node -> right)
-        {
-            temp -> right = node -> right;
-        }
-        delete node;
-        return temp;
-    }
 
+    if (node->left == NULL && node->right == NULL)
+    {
+        // Case 1: Node has no children
+        delete node;
+        return NULL;
+    }
+    else if (node->left == NULL)
+    {
+        // Case 2: Node has only right child
+        Node* temp = node->right;
+        delete node;
+        return temp;
+    }
+    else //if (node->right == NULL)
+    {
+        // Case 3: Node has only left child
+        Node* temp = node->left;
+        delete node;
+        return temp;
+    }
 }
+
 Node *AVLDelete(Node *node) //delete the node and rebalance the tree
 {
     node = Delete(node);
@@ -485,27 +543,40 @@ int ComputerBF(Node *node)
     return value;
 }
 
-Node *FindSearch(Node *node, int x, int y)
+Node* Find(int key, Node* root)
 {
-    if (node == NULL)
+    if (root == NULL)
     {
-        return NULL;
+        return NULL; // key not found in tree
     }
+    else if (root->data == key)
+    {
+        return root; // key found at root node
+    }
+    else if (root->data > key)
+    {
+        return Find(key, root->left); // search left subtree
+    }
+    else
+    {
+        return Find(key, root->right); // search right subtree
+    }
+}
 
-    if (node->data >= x && node->data < y)
-    {
-        return node;
-    }
+Node *FindSearch(int x, int y, Node *root)
+{
+    Node *list = NULL;
+    Node *node = Find(x, root);
 
-    if (node->data < x)
+    while (node != NULL && node->data <= y)
     {
-        return FindSearch(node->right, x, y);
+        if (node->data >= x)
+        {
+            list = AVLInsert(node->data, list);
+        }
+        node = Next(node);
     }
-
-    if (node->data > y)
-    {
-        return FindSearch(node->left, x, y);
-    }
+    return list;
 }
 
 Node *IsUnbalance(Node *node)
@@ -517,18 +588,15 @@ Node *IsUnbalance(Node *node)
 
     if (ComputerBF(node) > 1 || ComputerBF(node) < -1)
     {
-        cout << "The tree is unbalanced at node " << node -> data << endl;
+        node = Rebalance(node); // perform rebalancing
     }
 
-    else
-    {
-        cout << "The tree is balanced at node " << node -> data << endl;
-    }
     return node;
 }
 
 // Prints out the menu of choices for the user and returns their choice.
-int menu() {
+int menu()
+{
     int ans;
     cout<<"Here are your choices.\n";
     cout<<"1.  Insert an item into your tree.\n";
@@ -618,6 +686,7 @@ int main()
             cin >> y;
 
             Node *result = FindSearch(myRoot, x, y);
+
             if (result == NULL)
             {
                 cout << "No nodes found in the range.\n";
