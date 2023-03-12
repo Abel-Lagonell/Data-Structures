@@ -54,9 +54,9 @@ Node *RebalanceLeft(Node *node);
 Node *RebalanceRight(Node *node);
 Node *Rebalance(Node *node);
 Node  *AdjustHeight(Node *node);
-Node *Delete(Node *node);
+//Node *Delete(Node *node);
 Node *AVLInsert(int key, Node *root);
-Node *AVLDelete(Node *node);
+Node* AVLDelete(Node* node, int key) ;
 int ComputerBF(Node *node); //Computer Binary Factor
 Node *FindSearch(int x, int y, Node *root);
 Node *Find(int key, Node *root); // For FindSearch function
@@ -105,7 +105,8 @@ Node* insert(Node *root,Node *element)
         return root;
     }
 }
-int find(Node *currentPtr, int val) {
+int find(Node *currentPtr, int val)
+{
     // Check if there are nodes in the tree.
     if (currentPtr != NULL) {
         // Found the value at the root.
@@ -197,14 +198,16 @@ Node* findNode(Node *currentPtr, int value) {
 // Will delete the node storing value in the tree rooted at root. The
 // value must be present in the tree in order for this function to work.
 // The function returns a pointer to the root of the resulting tree.
-Node* deleteNode(Node* root, int value) {
+Node* deleteNode(Node* root, int value)
+{
     Node *delnode, *newDelNode, *saveNode;
     Node *par;
     int saveVal;
     delnode = findNode(root, value); // Get a pointer to the node to delete.
     par = parent(root, delnode); // Get the parent of this node.
     // Take care of the case where the node to delete is a leaf node.
-    if (isLeaf(delnode)) {// case 1
+    if (isLeaf(delnode))
+    {// case 1
         // Deleting the only node in the tree.
         if (par == NULL) {
             delete root; // free the memory for the node.
@@ -220,7 +223,7 @@ Node* deleteNode(Node* root, int value) {
             par->right = NULL;
         }
         return root; // Return the root of the new tree.
-    }
+}
     // Take care of the case where the node to be deleted only has a left
     // child.
     if (hasOnlyLeftChild(delnode)) {
@@ -288,24 +291,17 @@ Node *LeftDescendant(Node *node)
     }
 }
 
-Node *RightAncestor(Node *root, Node *node)
+Node* RightAncestor(Node* node)
 {
-    if (node == root)
+    while (node->parent != NULL)
     {
-        return NULL; // no right ancestor exists for the root node
+        if (node->parent->data < node->data)
+        {
+            return node->parent;
+        }
+        node = node->parent;
     }
-    Node *p = parent(root, node);
-    if (p == NULL || p->right == NULL || p->right == node)
-    {
-        return p; // return the parent if it is a right child or has no right sibling
-    }
-    Node *q = p->parent;
-    while (q != NULL && q->right == p)
-    {
-        p = q;
-        q = p->parent;
-    }
-    return q; // return the right ancestor of the node
+    return NULL;
 }
 
 Node *Next(Node *node) // returns the next node in the tree
@@ -330,45 +326,33 @@ Node *RotateLeft(Node *node)
     return temp; //temp is the new root
 }
 
-/*
 Node *RotateRight(Node *node)
-//A right rotation on a node, involves making the left child of node the new root of the subtree,
-    //a mirror image of the left rotation
 {
-    Node *temp = node->left; //temp is the new root
-    node->left = temp->right; //temp's right child becomes node's left child
-    temp->right = node; //node becomes temp's right child
-    return temp; //temp is the new root
-}
-*/
+    Node *parent = node->parent;
+    Node *leftChild = node->left;
+    Node *rightOfLeftChild = leftChild->right;
 
-Node *RotateRight(Node *X)
-{
-    Node *P = X->parent;
-    Node *Y = X->left;
-    Node *B = Y->right;
-
-    Y->parent = P;
-    if (P != NULL)
+    leftChild->parent = parent;
+    if (parent != NULL)
     {
-        if (P->right == X)
+        if (parent->right == node)
         {
-            P->right = Y;
+            parent->right = leftChild;
         }
         else
         {
-            P->left = Y;
+            parent->left = leftChild;
         }
     }
-    X->parent = Y;
-    Y->right = X;
-    if (B != NULL)
+    node->parent = leftChild;
+    leftChild->right = node;
+    if (rightOfLeftChild != NULL)
     {
-        B->parent = X;
+        rightOfLeftChild->parent = node;
     }
-    X->left = B;
+    node->left = rightOfLeftChild;
 
-    return Y;
+    return leftChild;
 }
 
 int ComputeHeight(Node *node) //Basically its the Height function
@@ -497,42 +481,75 @@ Node *AVLInsert(int key, Node *root)
     }
     return root;
 }
-
-Node* Delete(Node* node)
-{
-    if (node == NULL)
-    {
-        return node;
-    }
-
-    if (node->left == NULL && node->right == NULL)
-    {
-        // Case 1: Node has no children
+/*
+Node* Delete(Node* node) {
+    if (node->right == NULL) {
+        // Case 1: Node has no or only left child
+        Node* temp = node->left;
         delete node;
-        return NULL;
-    }
-    else if (node->left == NULL)
-    {
-        // Case 2: Node has only right child
+        return temp;
+    } else {
+        // Case 2: Node has both left and right child
+        Node* successor = node->right;
+        while (successor->left != NULL) {
+            successor = successor->left;
+        }
+        successor->left = node->left;
         Node* temp = node->right;
         delete node;
         return temp;
     }
-    else //if (node->right == NULL)
-    {
-        // Case 3: Node has only left child
-        Node* temp = node->left;
+}
+ */
+
+Node* AVLDelete(Node* node, int key) {
+    if (node == NULL) {
+        // Node with given key not found, return NULL.
+        return NULL;
+    }
+
+    if (key < node->data) {
+        // Key is smaller than node's data, recurse on left subtree.
+        node->left = AVLDelete(node->left, key);
+    } else if (key > node->data) {
+        // Key is greater than node's data, recurse on right subtree.
+        node->right = AVLDelete(node->right, key);
+    } else {
+        // Key is equal to node's data, delete the node.
+        Node* temp;
+        if (node->left == NULL && node->right == NULL) {
+            // Case 1: Node has no child.
+            temp = NULL;
+        } else if (node->left == NULL) {
+            // Case 2: Node has only right child.
+            temp = node->right;
+        } else if (node->right == NULL) {
+            // Case 3: Node has only left child.
+            temp = node->left;
+        } else {
+            // Case 4: Node has both left and right child.
+            Node* successor = node->right;
+            while (successor->left != NULL) {
+                successor = successor->left;
+            }
+            successor->left = node->left;
+            temp = node->right;
+        }
         delete node;
+
+        // If tree becomes empty after deleting node, return NULL.
+        if (temp == NULL) {
+            return NULL;
+        }
+
+        // Rebalance the tree.
+        temp = Rebalance(temp);
+
         return temp;
     }
 }
 
-Node *AVLDelete(Node *node) //delete the node and rebalance the tree
-{
-    node = Delete(node);
-    node = Rebalance(node);
-    return node;
-}
+
 
 int ComputerBF(Node *node)
 {
@@ -568,15 +585,32 @@ Node *FindSearch(int x, int y, Node *root)
     Node *list = NULL;
     Node *node = Find(x, root);
 
-    while (node != NULL && node->data <= y)
+    while (node != NULL && node->data < y)
     {
-        if (node->data >= x)
+        if (node->data > x)
         {
             list = AVLInsert(node->data, list);
         }
         node = Next(node);
     }
     return list;
+}
+
+int SumSearch(int x, int y, Node *root)
+{
+    Node *list = NULL;
+    Node *node = Find(x, root);
+    int sum = 0;
+
+    while (node != NULL && node->data < y)
+    {
+        if (node->data > x)
+        {
+            sum += node->data;
+        }
+        node = Next(node);
+    }
+    return sum;
 }
 
 Node *IsUnbalance(Node *node)
@@ -612,6 +646,7 @@ int menu()
     cin>> ans;
     return ans;
 }
+
 int main()
 {
     Node *myRoot=NULL, *tempNode;
@@ -626,17 +661,21 @@ int main()
             cin>>val;
             tempNode = new Node(val); // Create the node.
             // Insert the value.
-            myRoot =AVLInsert(myRoot, tempNode);
+            myRoot = AVLInsert(val, myRoot);
+            myRoot = IsUnbalance(myRoot); // Check and rebalance if necessary.
         }
 
-        if (ans == 2)
+        if (ans == 2) //Check #2 | Keeps ending program after deleting a node
         {
             cout<<"What value would you like to delete?\n";
             cin>>val;
             if (!find(myRoot, val))
                 cout<<"Sorry that value isn't in the tree to delete.\n";
-            else {
-                myRoot = deleteNode(myRoot, val);
+            else
+            {
+                myRoot = AVLDelete(myRoot, val);
+                myRoot = IsUnbalance(myRoot); // Check and rebalance if necessary.
+                //myRoot = deleteNode(myRoot, val);
             }
         }
 
@@ -645,9 +684,9 @@ int main()
             cout<<"What value would you like to search for?\n";
             cin>>val;
             if (find(myRoot, val))
-                cout<<" Found"<<val<<"in the tree.\n";
+                cout<<" Found "<<val<<" in the tree.\n";
             else
-                cout<<" Did not find" << val << "in the tree.\n";
+                cout<<" Did not find " << val << " in the tree.\n";
         }
 
         if (ans == 4)
@@ -678,14 +717,14 @@ int main()
                 }
             }
         }
+
         if (ans == 6)
         {
             cout << "Enter the start value of the range: ";
             cin >> x;
             cout << "Enter the end value of the range: ";
             cin >> y;
-
-            Node *result = FindSearch(myRoot, x, y);
+            Node *result = FindSearch(x, y, myRoot);
 
             if (result == NULL)
             {
@@ -699,6 +738,7 @@ int main()
                 cout << endl;
             }
         }
+
         if (ans == 7)
         {
             cout << "The height of the tree is ";
@@ -711,7 +751,8 @@ int main()
             cin >> x;
             cout << "Enter the start value of the range: ";
             cin >> y;
-            cout << "The sum of the nodes in the range [" << x << ", " << y << "] is " << add(myRoot) << "\n";
+            cout << "The sum of the nodes in the range [" << x << ", " << y << "] is ";
+            cout << SumSearch(x, y, myRoot) << endl;
         }
 
         if (ans == 9)
