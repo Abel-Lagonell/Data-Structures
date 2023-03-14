@@ -481,6 +481,11 @@ Node *AVLInsert(int key, Node *root)
 {
     Node* newNode = new Node(key); // create new node with given key
     root = insert(root, newNode);
+    
+    if (root == NULL)
+    {
+    	return NULL;
+    }
     if (!find(root, key)) // if the element is not found in the tree, then it is not inserted
     {
         root = Rebalance(root); // rebalanced the tree
