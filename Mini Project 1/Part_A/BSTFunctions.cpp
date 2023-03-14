@@ -1,3 +1,10 @@
+/*
+ * Student: Jaleel Rogers
+ * Date: 03/15/23
+ * Assignment: Part A BST-AVL API
+ * Description: This program is a modified BST API that will be used to create an AVL tree.
+ */
+
 #include <iostream>
 
 using namespace std;
@@ -55,7 +62,7 @@ Node *Rebalance(Node *node);
 Node  *AdjustHeight(Node *node);
 //Node *Delete(Node *node);
 Node *AVLInsert(int key, Node *root);
-Node* AVLDelete(Node* node, int key) ;
+Node *AVLDelete(Node* node, int key) ;
 int ComputerBF(Node *node); //Computer Binary Factor
 Node *FindSearch(int x, int y, Node *root);
 Node *Find(int key, Node *root); // For FindSearch function
@@ -501,34 +508,49 @@ Node* Delete(Node* node) {
 }
  */
 
-Node* AVLDelete(Node* node, int key) {
-    if (node == NULL) {
+Node *AVLDelete(Node* node, int key)
+{
+    if (node == NULL)
+    {
         // Node with given key not found, return NULL.
         return NULL;
     }
 
-    if (key < node->data) {
+    if (key < node->data)
+    {
         // Key is smaller than node's data, recurse on left subtree.
         node->left = AVLDelete(node->left, key);
-    } else if (key > node->data) {
-        // Key is greater than node's data, recurse on right subtree.
-        node->right = AVLDelete(node->right, key);
-    } else {
+    }
+        else if (key > node->data)
+        {
+            // Key is greater than node's data, recurse on right subtree.
+            node->right = AVLDelete(node->right, key);
+        }
+        else
+        {
         // Key is equal to node's data, delete the node.
         Node* temp;
-        if (node->left == NULL && node->right == NULL) {
+        if (node->left == NULL && node->right == NULL)
+        {
             // Case 1: Node has no child.
             temp = NULL;
-        } else if (node->left == NULL) {
+        }
+        else if (node->left == NULL)
+        {
             // Case 2: Node has only right child.
             temp = node->right;
-        } else if (node->right == NULL) {
+        }
+        else if (node->right == NULL)
+        {
             // Case 3: Node has only left child.
             temp = node->left;
-        } else {
+        }
+        else
+        {
             // Case 4: Node has both left and right child.
             Node* successor = node->right;
-            while (successor->left != NULL) {
+            while (successor->left != NULL)
+            {
                 successor = successor->left;
             }
             successor->left = node->left;
@@ -537,7 +559,8 @@ Node* AVLDelete(Node* node, int key) {
         delete node;
 
         // If tree becomes empty after deleting node, return NULL.
-        if (temp == NULL) {
+        if (temp == NULL)
+        {
             return NULL;
         }
 
@@ -546,9 +569,8 @@ Node* AVLDelete(Node* node, int key) {
 
         return temp;
     }
+        return NULL; //Helpful for g++
 }
-
-
 
 int ComputerBF(Node *node)
 {
