@@ -1,3 +1,8 @@
+/**
+ * @file Scheduler.cpp
+ * @author Abel Lagonell (alagonell1730@floridapoly.edu)
+ */
+
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -26,28 +31,12 @@ private:
     
 
     void AssignJobs(){
-        // TODO: replace this code with a faster algorithm.
         assigned_workers_.resize(jobs_.size());
         start_times_.resize(jobs_.size());
         vector<long long> next_free_time(num_workers_, 0);
-        for (int i = 0; i < jobs_.size(); i++) {
-            int duration = jobs_[i];
-            int next_worker = 0;
-            for (int j = 0; j < num_workers_; ++j) {
-                if (next_free_time[j] < next_free_time[next_worker])
-                    next_worker = j;
-            }
-            assigned_workers_[i] = next_worker;
-            start_times_[i] = next_free_time[next_worker];
-            next_free_time[next_worker] += duration;
-        }
-    }
-
-    void AssignJobsFast(){
-        assigned_workers_.resize(jobs_.size());
-        start_times_.resize(jobs_.size());
-        vector<long long> next_free_time(num_workers_, 0);
+        //Set up priority queue
         priority_queue<long long, vector<long long>, greater<long long>> pq;
+        //Fill priority queue with jobs
         for (auto i : jobs_){
             pq.push(i);
         }
@@ -56,6 +45,7 @@ private:
             long long duration = pq.top();
             pq.pop();
             int next_worker = 0;
+            //Find next worker to assign job to
             for (int j = 0; j < num_workers_; j++) {
                 if (next_free_time[j] < next_free_time[next_worker])
                     next_worker = j;
@@ -73,7 +63,7 @@ public:
     void Solve()
     {
         ReadData();
-        AssignJobsFast();
+        AssignJobs();
         WriteResponse();
     }
 };
