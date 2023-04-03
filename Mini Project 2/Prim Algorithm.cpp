@@ -26,8 +26,8 @@ private:
 public:
     
     Graph(int V){
-        this->Vertices = V;
-        adj = new list<pii>[V];
+        this->Vertices = V+1;
+        adj = new list<pii>[V+1];
     }
     
     // Function to add an edge to graph
@@ -42,23 +42,24 @@ public:
     void primMST(){
         priority_queue< pii, vector <pii> , greater<pii> > pq; // Holds the order of which the vertices will be visited (weight, vertex)
         int src =0;
-        vector <bool> inMST(Vertices, false); //Keeps track of which vertices were used in the MST
+        vector <bool> inMST(Vertices+1, false); //Keeps track of which vertices were used in the MST
         vector <int> value(Vertices, INF);
         vector <int> parent(Vertices, -1);
 
-        pq.push(make_pair(0, src));
+        pq.push(make_pair(0, src)); // Push the source vertex with a weight of 0
         value[src] = 0;
 
         while (!pq.empty()){
-            int u = pq.top().second;
+            int u = pq.top().second; // Get the second Vertex
             pq.pop();
+
             if (inMST[u] == true) continue; // If the vertex was already used in the MST, skip it (this is to avoid cycles)
-            inMST[u] = true;
+            inMST[u] = true; // Mark the vertex as used in the MST
             
-            list <pii>::iterator i;
-            for (i = adj[u].begin(); i != adj[u].end(); ++i){
-                int v = (*i).first;
-                int weight = (*i).second;
+            //For every neighbor of the vertex find the minimum weighted edge, excluding edges with vertices already used in the MST
+            for (auto x: adj[u]){
+                int v = x.first;
+                int weight = x.second;
                 
                 if (inMST[v] == false && value[v] > weight){
                     value[v] = weight;
@@ -82,7 +83,6 @@ int main(){
     g.addEdge(0, 2, 9);
     g.addEdge(1, 4, 9);
     g.addEdge(1, 2, 12);
-    g.addEdge(4, 7, 8);
     g.addEdge(2, 3, 8);
     g.addEdge(2, 5, 2);
     g.addEdge(3, 4, 3);
@@ -93,7 +93,6 @@ int main(){
     g.addEdge(6, 7, 15);
     g.addEdge(6, 8, 11);
     g.addEdge(7, 8, 10);
-    
     g.primMST();
     
     return 0;
