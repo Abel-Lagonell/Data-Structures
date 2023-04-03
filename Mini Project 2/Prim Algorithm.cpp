@@ -19,6 +19,7 @@ private:
     
     // Adjacency list representation Pair of a neighbor vertex and a weight for every edge
     list< pair<int, int> > *adj;
+    priority_queue< pair<int, int>, vector <pair<int, int>> , greater<pair<int, int>> > pq;
 
 public:
     
@@ -28,7 +29,9 @@ public:
     }
     
     // Function to add an edge to graph
-    void addEdge(int u, int v, int w){}
+    void addEdge(int u, int v, int w){
+        
+    }
     
     // Print MST using Prim's algorithm
     void primMST(){
